@@ -11,7 +11,9 @@ let comments = [
     email: "usuario@example.com",
     contenido: "Excelente primer post!",
     estado: "aprobado",
+
     fechaCreacion: new Date().toISOString(),
+    likes: [],
   },
 ];
 
@@ -47,8 +49,17 @@ async function getCommentsByPost(req, res) {
     const inicio = (paginaNum - 1) * limiteNum;
     const paginados = resultados.slice(inicio, inicio + limiteNum);
 
+
+
+    // Enriquecer con info de likes
+    const commentsConLikes = paginados.map(c => ({
+      ...c,
+      likesCount: c.likes ? c.likes.length : 0,
+      isLiked: req.user ? (c.likes && c.likes.includes(req.user.username)) : false
+    }));
+
     res.json({
-      comments: paginados,
+      comments: commentsConLikes,
       meta: {
         total: resultados.length,
         pagina: paginaNum,
@@ -85,7 +96,9 @@ async function createComment(req, res) {
       email: email ? email.trim() : null,
       contenido: contenido.trim(),
       estado: "pendiente", // Comentarios nuevos necesitan aprobación
+
       fechaCreacion: new Date().toISOString(),
+      likes: [],
     };
 
     comments.push(nuevoComment);
@@ -163,6 +176,51 @@ async function deleteComment(req, res) {
       error: "Error interno del servidor",
     });
   }
+
+  // Dar/Quitar like a un comentario
+}
+
+// Dar/Quitar like a un comentario
+async function toggleLikeComment(req, res) {
+  try {
+    const { id } = req.params;
+    const username = req.user.username;
+
+    const comment = comments.find((c) => c.id === id);
+
+    if (!comment) {
+      return res.status(404).json({
+        error: "Comentario no encontrado",
+      });
+    }
+
+    if (!comment.likes) {
+      comment.likes = [];
+    }
+
+    const index = comment.likes.indexOf(username);
+    let message = "";
+
+    if (index === -1) {
+      comment.likes.push(username);
+      message = "Comentario likeado";
+    } else {
+      comment.likes.splice(index, 1);
+      message = "Like removido del comentario";
+    }
+
+    res.json({
+      message,
+      likesCount: comment.likes.length,
+      isLiked: index === -1
+    });
+
+  } catch (error) {
+    console.error("Error toggleando like en comentario:", error);
+    res.status(500).json({
+      error: "Error interno del servidor",
+    });
+  }
 }
 
 module.exports = {
@@ -170,4 +228,5 @@ module.exports = {
   createComment,
   updateCommentStatus,
   deleteComment,
+  toggleLikeComment,
 };

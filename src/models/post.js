@@ -10,4 +10,5 @@ const Post = {
   fechaCreacion: "datetime",
   fechaActualizacion: "datetime",
   visitas: "number",
+  likes: "array (usernames)",
 };

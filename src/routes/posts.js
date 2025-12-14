@@ -7,7 +7,9 @@ const {
   getPostById,
   createPost,
   updatePost,
+
   deletePost,
+  toggleLikePost,
 } = require("../controllers/postsController");
 
 const router = express.Router();
@@ -51,6 +53,15 @@ router.get(
   param("id").isUUID().withMessage("ID debe ser un UUID válido"),
   validarErrores,
   getPostById
+);
+
+// POST /posts/:id/like - Dar/Quitar like (requiere autenticación)
+router.post(
+  "/:id/like",
+  authenticate,
+  param("id").isUUID().withMessage("ID debe ser un UUID válido"),
+  validarErrores,
+  toggleLikePost
 );
 
 // POST /posts - Crear post (requiere autenticación)

@@ -6,7 +6,9 @@ const {
   getCommentsByPost,
   createComment,
   updateCommentStatus,
+
   deleteComment,
+  toggleLikeComment,
 } = require("../controllers/commentsController");
 
 const router = express.Router();
@@ -93,6 +95,15 @@ router.delete(
   param("id").isUUID().withMessage("ID de comentario debe ser un UUID válido"),
   validarErrores,
   deleteComment
+);
+
+// POST /comments/:id/like - Dar/Quitar like (requiere autenticación)
+router.post(
+  "/comments/:id/like",
+  authenticate,
+  param("id").isUUID().withMessage("ID de comentario debe ser un UUID válido"),
+  validarErrores,
+  toggleLikeComment
 );
 
 module.exports = router;
