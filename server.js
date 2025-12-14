@@ -8,6 +8,7 @@ const helmet = require("helmet");
 const authRoutes = require("./src/routes/auth");
 const postsRoutes = require("./src/routes/posts");
 const commentsRoutes = require("./src/routes/comments");
+const categoriesRoutes = require("./src/routes/categories");
 
 // Crear aplicación
 const app = express();
@@ -61,6 +62,7 @@ app.use((req, res, next) => {
 // Rutas de la API
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postsRoutes);
+app.use("/api/categories", categoriesRoutes);
 app.use("/api", commentsRoutes);
 
 // Documentación OpenAPI básica

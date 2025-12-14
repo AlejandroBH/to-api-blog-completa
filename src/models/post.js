@@ -5,6 +5,7 @@ const Post = {
   contenido: "string (required)",
   autor: "string (required)",
   etiquetas: "array",
+  categoriaId: "uuid (optional)",
   estado: "enum: borrador, publicado, archivado",
   fechaCreacion: "datetime",
   fechaActualizacion: "datetime",
