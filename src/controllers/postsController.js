@@ -1,6 +1,7 @@
 // controllers/postsController.js
 const { v4: uuidv4 } = require("uuid");
 const { categories } = require("./categoriesController");
+const { parseAndFilter } = require("../utils/queryParser");
 
 // Base de datos simulada
 let posts = [
@@ -30,6 +31,7 @@ async function getPosts(req, res) {
       ordenar = "fechaCreacion",
       pagina = 1,
       limite = 10,
+      q
     } = req.query;
 
     // Filtros
@@ -57,6 +59,16 @@ async function getPosts(req, res) {
           p.titulo.toLowerCase().includes(termino) ||
           p.contenido.toLowerCase().includes(termino)
       );
+      resultados = resultados.filter(
+        (p) =>
+          p.titulo.toLowerCase().includes(termino) ||
+          p.contenido.toLowerCase().includes(termino)
+      );
+    }
+
+    // Búsqueda Avanzada (Elasticsearch-like)
+    if (q) {
+      resultados = parseAndFilter(q, resultados, ["titulo", "contenido", "autor"]);
     }
 
     // Ordenamiento
