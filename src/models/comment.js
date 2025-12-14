@@ -7,4 +7,5 @@ const Comment = {
   email: "string (optional)",
   estado: "enum: pendiente, aprobado, rechazado",
   fechaCreacion: "datetime",
+  likes: "array (usernames)",
 };

@@ -15,6 +15,7 @@ let posts = [
     fechaCreacion: new Date().toISOString(),
     fechaActualizacion: new Date().toISOString(),
     visitas: 0,
+    likes: [],
   },
 ];
 
@@ -90,8 +91,15 @@ async function getPosts(req, res) {
     const inicio = (paginaNum - 1) * limiteNum;
     const paginados = resultados.slice(inicio, inicio + limiteNum);
 
+    // Enriquecer con info de likes si el usuario está autenticado (o no)
+    const postsConLikes = paginados.map(p => ({
+      ...p,
+      likesCount: p.likes ? p.likes.length : 0,
+      isLiked: req.user ? (p.likes && p.likes.includes(req.user.username)) : false
+    }));
+
     res.json({
-      posts: paginados,
+      posts: postsConLikes,
       meta: {
         total: resultados.length,
         pagina: paginaNum,
@@ -124,7 +132,11 @@ async function getPostById(req, res) {
     post.visitas += 1;
 
     // Poblar categoría
-    const postConCategoria = { ...post };
+    const postConCategoria = {
+      ...post,
+      likesCount: post.likes ? post.likes.length : 0,
+      isLiked: req.user ? (post.likes && post.likes.includes(req.user.username)) : false
+    };
     if (post.categoriaId) {
       const cat = categories.find((c) => c.id === post.categoriaId);
       postConCategoria.categoria = cat || null;
@@ -163,7 +175,9 @@ async function createPost(req, res) {
       estado: estado || "borrador",
       fechaCreacion: new Date().toISOString(),
       fechaActualizacion: new Date().toISOString(),
+
       visitas: 0,
+      likes: [],
     };
 
     posts.push(nuevoPost);
@@ -265,6 +279,51 @@ async function deletePost(req, res) {
   }
 }
 
+// Dar/Quitar like a un post
+async function toggleLikePost(req, res) {
+  try {
+    const { id } = req.params;
+    const username = req.user.username;
+
+    const post = posts.find((p) => p.id === id);
+
+    if (!post) {
+      return res.status(404).json({
+        error: "Post no encontrado",
+      });
+    }
+
+    if (!post.likes) {
+      post.likes = [];
+    }
+
+    const index = post.likes.indexOf(username);
+    let message = "";
+
+    if (index === -1) {
+      // Dar like
+      post.likes.push(username);
+      message = "Post likeado";
+    } else {
+      // Quitar like
+      post.likes.splice(index, 1);
+      message = "Like removido del post";
+    }
+
+    res.json({
+      message,
+      likesCount: post.likes.length,
+      isLiked: index === -1
+    });
+
+  } catch (error) {
+    console.error("Error toggleando like en post:", error);
+    res.status(500).json({
+      error: "Error interno del servidor",
+    });
+  }
+}
+
 module.exports = {
   posts,
   getPosts,
@@ -272,4 +331,5 @@ module.exports = {
   createPost,
   updatePost,
   deletePost,
+  toggleLikePost,
 };
