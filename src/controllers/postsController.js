@@ -1,5 +1,6 @@
 // controllers/postsController.js
 const { v4: uuidv4 } = require("uuid");
+const { categories } = require("./categoriesController");
 
 // Base de datos simulada
 let posts = [
@@ -24,6 +25,7 @@ async function getPosts(req, res) {
       autor,
       estado,
       etiqueta,
+      categoria,
       busqueda,
       ordenar = "fechaCreacion",
       pagina = 1,
@@ -41,6 +43,10 @@ async function getPosts(req, res) {
 
     if (etiqueta) {
       resultados = resultados.filter((p) => p.etiquetas.includes(etiqueta));
+    }
+
+    if (categoria) {
+      resultados = resultados.filter((p) => p.categoriaId === categoria);
     }
 
     // Búsqueda
@@ -105,7 +111,14 @@ async function getPostById(req, res) {
     // Incrementar visitas
     post.visitas += 1;
 
-    res.json(post);
+    // Poblar categoría
+    const postConCategoria = { ...post };
+    if (post.categoriaId) {
+      const cat = categories.find((c) => c.id === post.categoriaId);
+      postConCategoria.categoria = cat || null;
+    }
+
+    res.json(postConCategoria);
   } catch (error) {
     console.error("Error obteniendo post:", error);
     res.status(500).json({
@@ -117,8 +130,16 @@ async function getPostById(req, res) {
 // Crear nuevo post
 async function createPost(req, res) {
   try {
-    const { titulo, contenido, etiquetas, estado } = req.body;
+    const { titulo, contenido, etiquetas, estado, categoriaId } = req.body;
     const autor = req.user.username;
+
+    // Validar categoría si se envía
+    if (categoriaId) {
+      const existeCat = categories.some((c) => c.id === categoriaId);
+      if (!existeCat) {
+        return res.status(400).json({ error: "Categoría no encontrada" });
+      }
+    }
 
     const nuevoPost = {
       id: uuidv4(),
@@ -126,6 +147,7 @@ async function createPost(req, res) {
       contenido: contenido.trim(),
       autor,
       etiquetas: etiquetas || [],
+      categoriaId: categoriaId || null,
       estado: estado || "borrador",
       fechaCreacion: new Date().toISOString(),
       fechaActualizacion: new Date().toISOString(),
@@ -165,13 +187,22 @@ async function updatePost(req, res) {
       });
     }
 
-    const { titulo, contenido, etiquetas, estado } = req.body;
+    const { titulo, contenido, etiquetas, estado, categoriaId } = req.body;
+
+    // Validar categoría si se envía
+    if (categoriaId) {
+      const existeCat = categories.some((c) => c.id === categoriaId);
+      if (!existeCat) {
+        return res.status(400).json({ error: "Categoría no encontrada" });
+      }
+    }
 
     // Actualizar campos
     if (titulo) post.titulo = titulo.trim();
     if (contenido) post.contenido = contenido.trim();
     if (etiquetas) post.etiquetas = etiquetas;
     if (estado) post.estado = estado;
+    if (categoriaId !== undefined) post.categoriaId = categoriaId;
 
     post.fechaActualizacion = new Date().toISOString();
 
