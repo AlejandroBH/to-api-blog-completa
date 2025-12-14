@@ -223,6 +223,7 @@ async function deletePost(req, res) {
 }
 
 module.exports = {
+  posts,
   getPosts,
   getPostById,
   createPost,

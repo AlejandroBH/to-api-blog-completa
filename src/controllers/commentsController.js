@@ -1,5 +1,6 @@
 // controllers/commentsController.js
 const { v4: uuidv4 } = require("uuid");
+const { posts } = require("./postsController");
 
 // Base de datos simulada
 let comments = [
