@@ -221,6 +221,37 @@ app.get("/", (req, res) => {
         </details>
       </div>
 
+      <div class="endpoint">
+        <span class="method">POST</span> <code>/api/auth/verify</code> <span class="auth">Requiere Auth</span>
+        <p>Verificar validez del token actual.</p>
+      </div>
+
+      <h2>📂 Categorías</h2>
+      <div class="endpoint">
+        <span class="method">GET</span> <code>/api/categories</code> <span class="public">Público</span>
+        <p>Listar todas las categorías.</p>
+      </div>
+
+      <div class="endpoint">
+        <span class="method">GET</span> <code>/api/categories/:id</code> <span class="public">Público</span>
+        <p>Obtener una categoría específica.</p>
+      </div>
+
+      <div class="endpoint">
+        <span class="method">POST</span> <code>/api/categories</code> <span class="auth">Admin</span>
+        <p>Crear nueva categoría.</p>
+      </div>
+
+      <div class="endpoint">
+        <span class="method">PUT</span> <code>/api/categories/:id</code> <span class="auth">Admin</span>
+        <p>Actualizar categoría existente.</p>
+      </div>
+
+      <div class="endpoint">
+        <span class="method">DELETE</span> <code>/api/categories/:id</code> <span class="auth">Admin</span>
+        <p>Eliminar categoría.</p>
+      </div>
+
       <h2>📄 Posts</h2>
       <div class="endpoint">
         <span class="method">GET</span> <code>/api/posts</code> <span class="public">Público</span>
@@ -247,6 +278,11 @@ app.get("/", (req, res) => {
         <p>Eliminar post (solo autor o admin).</p>
       </div>
 
+      <div class="endpoint">
+        <span class="method">POST</span> <code>/api/posts/:id/like</code> <span class="auth">Requiere Auth</span>
+        <p>Dar o quitar like a un post.</p>
+      </div>
+
       <h2>💬 Comentarios</h2>
       <div class="endpoint">
         <span class="method">GET</span> <code>/api/posts/:postId/comments</code> <span class="public">Público</span>
@@ -256,6 +292,21 @@ app.get("/", (req, res) => {
       <div class="endpoint">
         <span class="method">POST</span> <code>/api/posts/:postId/comments</code> <span class="public">Público</span>
         <p>Crear comentario en un post.</p>
+      </div>
+
+      <div class="endpoint">
+        <span class="method">PUT</span> <code>/api/comments/:id/status</code> <span class="auth">Admin</span>
+        <p>Actualizar estado de comentario (pendiente/aprobado/rechazado).</p>
+      </div>
+
+      <div class="endpoint">
+        <span class="method">DELETE</span> <code>/api/comments/:id</code> <span class="auth">Admin</span>
+        <p>Eliminar comentario.</p>
+      </div>
+
+       <div class="endpoint">
+        <span class="method">POST</span> <code>/api/comments/:id/like</code> <span class="auth">Requiere Auth</span>
+        <p>Dar o quitar like a un comentario.</p>
       </div>
 
       <h2>📚 Documentación</h2>
