@@ -123,4 +123,5 @@ module.exports = {
   findUserByCredentials,
   hashPassword,
   verifyPassword,
+  users,
 };

@@ -9,6 +9,7 @@ const authRoutes = require("./src/routes/auth");
 const postsRoutes = require("./src/routes/posts");
 const commentsRoutes = require("./src/routes/comments");
 const categoriesRoutes = require("./src/routes/categories");
+const dashboardRoutes = require("./src/routes/dashboard");
 
 // Crear aplicación
 const app = express();
@@ -59,11 +60,15 @@ app.use((req, res, next) => {
   next();
 });
 
+// Servir archivos estáticos del frontend
+app.use(express.static("public"));
+
 // Rutas de la API
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postsRoutes);
 app.use("/api/categories", categoriesRoutes);
 app.use("/api", commentsRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Documentación OpenAPI básica
 app.get("/api/docs", (req, res) => {
